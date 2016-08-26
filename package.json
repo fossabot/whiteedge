@@ -1,0 +1,24 @@
+{
+  "name": "whiteedge",
+  "version": "1.0.0",
+  "description": "White Edge",
+  "main": "whiteedge.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://devnullnor@bitbucket.org/devnullnor/whiteedge.git"
+  },
+  "keywords": [
+    "MongoDB",
+    "graph",
+    "documents"
+  ],
+  "author": "Pål Thingbø",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/devnullnor/whiteedge#readme",
+  "dependencies": {
+    "bluebird": "^3.4.3"
+  }
+}
