@@ -1,13 +1,10 @@
 'use strict'
 
 // Modules
-var Promise = require('bluebird')
-var co = require('co')
-var lib = require('./lib/_api')
-
-// Module vars
-
-// Local functions
+var Promise = require('bluebird'),
+  co = require('co'),
+  lib = require('./lib/_lib'),
+  helpers = require('./lib/_helpers')
 
 // Client
 function EdgeClient (db) {
@@ -28,7 +25,7 @@ function EdgeClient (db) {
     options: null, // MongoDB options
     collection: null // MongoDB collection
   }
-  
+
   /**
    * Private instance methods.
    * These methods have access to privat instance variables and methods.
@@ -185,7 +182,13 @@ function EdgeClient (db) {
 
   // Starting point for all api calls    
   this.use = function (api) {
-    vars.api = api
+    if (helpers.isString(api)) {
+      co(function * () {
+        vars.api = yield db.collection('_apis').find({'code': params.use}).limit(1).next()
+      })
+    } else {
+      vars.api = api
+    }
     return this
   }
 
@@ -276,7 +279,7 @@ function EdgeClient (db) {
       return Promise.resolve(results)
     } else {
       var cleanedge = {
-        _id: lib.getUUID(),
+        _id: helpers.getUUID(),
         predicate: edge.predicate,
         edges: edge.docs
       }
@@ -301,7 +304,7 @@ function EdgeClient (db) {
     vars.api = yield lib.replaceGlobals(vars.api)
     options = yield lib.inspectObject(vars.api.options, options)
     if (!vars.api.pipeline) throw new Error('API: aggregate requires a [pipeline] element, which was not supplied in the API.')
-    if (!lib.isArray(vars.api.pipeline)) throw new Error('API: aggregate requires a [pipeline] element (array), which was not supplied in the API.')
+    if (!helpers.isArray(vars.api.pipeline)) throw new Error('API: aggregate requires a [pipeline] element (array), which was not supplied in the API.')
 
     if (pipeline) {
       for (var i = 0; i < vars.api.pipeline.length; i++) {
@@ -335,7 +338,7 @@ function EdgeClient (db) {
     options = yield lib.inspectObject(vars.api.options, options)
     if (!vars.api.doc) throw new Error('API: insertOne requires a [doc] element, which was not supplied in the API.')
     doc = yield lib.inspectObject(vars.api.doc, doc)
-    doc._id = doc._id || lib.getUUID()
+    doc._id = doc._id || helpers.getUUID()
     yield db.collection(vars.collection).insertOne(doc, options)
     return Promise.resolve(doc)
   })
@@ -347,7 +350,7 @@ function EdgeClient (db) {
     if (!vars.api.doc) throw new Error('API: insertMany requires a [doc] element, which was not supplied in the API.')
     for (var i = 0; i < docs.length; i++) {
       docs[i] = yield lib.inspectObject(vars.api.doc, docs[i])
-      docs[i]._id = docs[i]._id || lib.getUUID()
+      docs[i]._id = docs[i]._id || helpers.getUUID()
     }
     var results = yield db.collection(vars.collection).insertMany(docs, options)
     return Promise.resolve(results)
@@ -602,12 +605,14 @@ function EdgeClient (db) {
         vars.limit = yield lib.inspectInput('Limit', vars.api.limit, vars.limit, false)
         vars.skip = yield lib.inspectInput('Skip', vars.api.skip, vars.skip, true)
 
+        
         var cursor = db.collection(vars.collection).find(vars.query)
         if (vars.sort) cursor = cursor.sort(vars.sort)
         if (vars.project) cursor = cursor.project(vars.project)
         if (vars.skip) cursor = cursor.skip(vars.skip)
         if (vars.limit) cursor = cursor.limit(vars.limit)
 
+        
         // We give the client the cursor count (happy client!)
         var totalcount = yield cursor.count(false)
         var limitcount = yield cursor.count(false)
@@ -644,10 +649,13 @@ function EdgeClient (db) {
 }
 
 module.exports = {
-  connect: function (db) {
+  connect: co.wrap(function * (db) {
     db.EdgeClient = new EdgeClient(db)
+
     db.use = function (api) {
       return db.EdgeClient.use(api)
     }
-  }
+
+    return Promise.resolve()
+  })
 }
