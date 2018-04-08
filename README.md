@@ -1,4 +1,4 @@
-## Synopsis
+# Synopsis
 
 **White Edge** White Edge is a framework for building database API's on top of MongoDB. You will interact with White Edge through declarative JSON structures that you can create on the fly, or store persistently in White Edge. White Edge API enables you to pass queries directly from a client to MongoDB, passing them through an API filter.
 
