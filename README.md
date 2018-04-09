@@ -1,4 +1,6 @@
 # Synopsis
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdevnullnor%2Fwhiteedge.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdevnullnor%2Fwhiteedge?ref=badge_shield)
+
 
 **White Edge** White Edge is a framework for building database API's on top of MongoDB. You will interact with White Edge through declarative JSON structures that you can create on the fly, or store persistently in White Edge. White Edge API enables you to pass queries directly from a client to MongoDB, passing them through an API filter.
 
@@ -19,3 +21,6 @@ White Edge was created to eliviate programmers from having to create relations b
 
 ## License
 Copyright (c) 2013-2016 Pål Thingbø. Licensed under the [GNU General Public License](https://en.wikipedia.org/wiki/GNU_General_Public_License).
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdevnullnor%2Fwhiteedge.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdevnullnor%2Fwhiteedge?ref=badge_large)
